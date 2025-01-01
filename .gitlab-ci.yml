@@ -6,6 +6,8 @@ stages:
 variables:
   DOCKER_IMAGE_BACKEND: ahmed1091/backend
   DOCKER_IMAGE_FRONTEND: ahmed1091/frontend
+  DOCKER_USERNAME: your_docker_username
+  DOCKER_PASSWORD: your_docker_password
 
 # Step 1: Build Backend Docker Image
 build_backend:
@@ -56,5 +58,17 @@ deploy:
     # Run the containers (this will simulate local deployment)
     - docker run -d --name backend -p 5001:5001 $DOCKER_IMAGE_BACKEND:latest
     - docker run -d --name frontend -p 5173:5173 $DOCKER_IMAGE_FRONTEND:latest
+  only:
+    - master
+
+# Step 5: Trigger Jenkins Deployment (After CI Success)
+trigger_jenkins_deployment:
+  stage: deploy
+  image: curlimages/curl:latest
+  script:
+    - echo "Triggering Jenkins deployment pipeline..."
+    - >
+      curl -X POST http://your-jenkins-server/job/your-jenkins-job-name/build \
+      --user your-jenkins-user:$JENKINS_API_TOKEN
   only:
     - master
