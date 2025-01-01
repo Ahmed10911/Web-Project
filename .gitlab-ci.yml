@@ -1,0 +1,52 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  DOCKER_IMAGE_BACKEND: ahmed1091/backend
+  DOCKER_IMAGE_FRONTEND: ahmed1091/frontend
+
+# Step 1: Build Backend Docker Image
+build_backend:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    - docker build -t $DOCKER_IMAGE_BACKEND:latest backend/
+    - docker push $DOCKER_IMAGE_BACKEND:latest
+  only:
+    - master
+
+# Step 2: Build Frontend Docker Image
+build_frontend:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    - docker build -t $DOCKER_IMAGE_FRONTEND:latest frontend/
+    - docker push $DOCKER_IMAGE_FRONTEND:latest
+  only:
+    - master
+
+# Step 3: Run Unit Tests
+run_tests:
+  stage: test
+  image: node:18
+  script:
+    - cd backend && npm install && npm test
+  only:
+    - master
+
+# Step 4: Database Migrations (Optional)
+db_migrations:
+  stage: deploy
+  image: node:18
+  script:
+    - cd backend && npm install && npm run migrate
+  only:
+    - master
