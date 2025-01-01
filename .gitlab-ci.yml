@@ -42,11 +42,19 @@ run_tests:
   only:
     - master
 
-# Step 4: Database Migrations (Optional)
-db_migrations:
+# Step 4: Deploy - Simulate Local Deployment
+deploy:
   stage: deploy
-  image: node:18
+  image: docker:latest
+  services:
+    - docker:dind
   script:
-    - cd backend && npm install && npm run migrate
+    - echo "Deploying application locally..."
+    # Pull the latest images (Optional if you want to deploy on other systems)
+    - docker pull $DOCKER_IMAGE_BACKEND:latest
+    - docker pull $DOCKER_IMAGE_FRONTEND:latest
+    # Run the containers (this will simulate local deployment)
+    - docker run -d --name backend -p 5001:5001 $DOCKER_IMAGE_BACKEND:latest
+    - docker run -d --name frontend -p 5173:5173 $DOCKER_IMAGE_FRONTEND:latest
   only:
     - master
