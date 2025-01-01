@@ -68,6 +68,6 @@ trigger_jenkins_deployment:
   script:
     - echo "Triggering Jenkins deployment pipeline..."
     - >
-      curl -X POST http://localhost:8080/job/GitLab-Deploy/build --user Ahmed:$bilal096
+      curl -X POST http://127.0.0.1:8080/job/GitLab-Deploy/build --user Ahmed:$bilal096
   only:
     - master
