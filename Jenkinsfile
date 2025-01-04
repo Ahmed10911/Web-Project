@@ -8,8 +8,15 @@ pipeline {
     stages {
         stage('Clean Workspace') {
             steps {
-                // Remove the existing directory before cloning
-                bat 'rmdir /s /q Web-Project'
+                // Check if the directory exists before trying to remove it
+                script {
+                    def dir = 'Web-Project'
+                    if (fileExists(dir)) {
+                        bat "rmdir /s /q ${dir}"
+                    } else {
+                        echo "Directory ${dir} does not exist, skipping cleanup."
+                    }
+                }
             }
         }
 
