@@ -6,8 +6,16 @@ pipeline {
     }
 
     stages {
+        stage('Clean Workspace') {
+            steps {
+                // Remove the existing directory before cloning
+                bat 'rmdir /s /q Web-Project'
+            }
+        }
+
         stage('Checkout Code') {
             steps {
+                // Clone the repository from GitLab
                 bat 'git clone --branch master https://gitlab.com/Ahmed10911/Web-Project.git'
             }
         }
@@ -21,9 +29,7 @@ pipeline {
 
         stage('Push to Docker Hub') {
             steps {
-                // Use the 'withCredentials' block to inject DockerHub credentials
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    // Login to Docker Hub using the injected credentials
                     bat 'docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%'
                     bat 'docker push ahmed1091/backend:latest'
                     bat 'docker push ahmed1091/frontend:latest'
