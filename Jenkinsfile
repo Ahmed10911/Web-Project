@@ -8,14 +8,14 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'master', url: 'https://gitlab.com/Ahmed10911/Web-Project.git'
+                bat 'git clone --branch master https://gitlab.com/Ahmed10911/Web-Project.git'
             }
         }
 
         stage('Build Docker Images') {
             steps {
-                sh 'docker build -t ahmed1091/backend:latest ./backend'
-                sh 'docker build -t ahmed1091/frontend:latest ./frontend'
+                bat 'docker build -t ahmed1091/backend:latest .\\backend'
+                bat 'docker build -t ahmed1091/frontend:latest .\\frontend'
             }
         }
 
@@ -24,19 +24,19 @@ pipeline {
                 // Use the 'withCredentials' block to inject DockerHub credentials
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     // Login to Docker Hub using the injected credentials
-                    sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
-                    sh 'docker push ahmed1091/backend:latest'
-                    sh 'docker push ahmed1091/frontend:latest'
+                    bat 'docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%'
+                    bat 'docker push ahmed1091/backend:latest'
+                    bat 'docker push ahmed1091/frontend:latest'
                 }
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh '''
-                    echo "$KUBECONFIG" > $HOME/.kube/config
-                    kubectl apply -f k8s/deployment.yaml
-                    kubectl apply -f k8s/service.yaml
+                bat '''
+                    echo %KUBECONFIG% > %USERPROFILE%\\.kube\\config
+                    kubectl apply -f k8s\\deployment.yaml
+                    kubectl apply -f k8s\\service.yaml
                 '''
             }
         }
